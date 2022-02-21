@@ -1,38 +1,63 @@
+""" This module reads the downloaded files from different folders starting
+from on location and it's subfolder (path_dsm) and copies all the necessary 
+files to a one folder (destination_dsm)
+"""
+
 import os
 import shutil
 from natsort import natsorted
-from numpy import source
 import shapefile
 import pandas as pd
 import re
 from typing import Tuple
+import json
 
-"""import rasterio
-import numpy as np
-from affine import Affine
-from pyproj import Proj, transform"""
 
-os.system("clear")
-""" This module reads the downloaded files from different folders starting
-from on location and it's subfolder (path_dsm) and copies all the necessary 
-files to a one folder (destination_dsm)"""
+# clear the screen
+os.system('cls' if os.name == 'nt' else 'clear')
 
-# Paths
-path_dsm = "/Users/jari/DATA/Projects/3D_House_DSM/"
-destination_dsm = "/Users/jari/DATA/Projects/DSM/"
-path_dtm = "/Users/jari/DATA/Projects/3D_House_DTM/"
-destination_dtm = "/Users/jari/DATA/Projects/DTM/"
+
+def write_paths():
+    """" 
+    This function creates a JSON file that can be used later for reading the
+    paths. https://stackabuse.com/reading-and-writing-json-to-a-file-in-python/
+    """
+    directories = {
+            "dsm_source" : "/Users/jari/DATA/Projects/3D_House_DSM/",
+            "dsm_path" : "/Users/jari/DATA/Projects/DSM/",
+            "dtm_source" : "/Users/jari/DATA/Projects/3D_House_DTM/",
+            "dtm_path" : "/Users/jari/DATA/Projects/DTM/"
+            }
+    json_string = json.dumps(directories)
+    with open('./data/dsm_and_dtm_directories', 'w') as outfile:
+        outfile.write(json_string)
+
+
+def read_paths()-> Tuple[str,str,str,str]:
+    """
+    Reads correct paths from JSON file
+    :returns : all paths (str) in the order: dsm_path, dtm_path, dsm_source, dtm_source
+    """
+    with open('./data/dsm_and_dtm_directories') as json_file:
+        paths = dict(json.load(json_file))
+        dsm_source = paths.get('dsm_source')
+        dsm_path = paths.get('dsm_path')
+        dtm_source = paths.get('dtm_source')
+        dtm_path = paths.get('dtm_path')
+        return dsm_path, dtm_path, dsm_source, dtm_source
 
 def copy_files(dsm:bool):
     """ copies files to DSM or DTM folder. 
     :dsm : a boolean value, if True DSM files are copied. Otherwise DTM files will be copied"""
 
+    dsm_path, dtm_path, dsm_source, dtm_source = read_paths()
+
     if dsm:
-        source_path = path_dsm
-        dest_path = destination_dsm
+        source_path = dsm_source
+        dest_path = dsm_path
     else:
-        source_path = path_dtm
-        dest_path = destination_dtm
+        source_path = dtm_source
+        dest_path = dtm_path
     
     counter = 0
 
@@ -55,15 +80,16 @@ def copy_files(dsm:bool):
                 counter += 1
     print("Total count of files:", counter)
 
-# copy_files(False)
+copy_files(False)
 
 def create_list_of_shp_files() -> Tuple[list, list]:
     """
     Searches all the files ending with .shp and adds those filenames to a list. Creates a sexond list that has tif-names.
     :return : two lists. First one is containing all the .shp filenames and second one generated .tif files.
     """
+    dsm_path, dtm_path, dsm_source, dtm_source = read_paths()
     # Creating a list of .shp files and sorting the list
-    all_files = os.listdir(destination_dsm)
+    all_files = os.listdir(dsm_path)
     shp_files=[]
     for filename in all_files:
         if filename.endswith(".shp"):
@@ -91,12 +117,13 @@ def create_lambert_coordinates():
     """
     Creating lambert coordinates and saving it to a file
     """
+    dsm_path, dtm_path, dsm_source, dtm_source = read_paths()
     shp_files, tif_files = create_list_of_shp_files()
     left_list, bottom_list, right_list, top_list = [], [], [], []
 
     # Read the boundaries and add them to lists
     for filename in shp_files:
-        sh = shapefile.Reader(os.path.join(destination_dtm, filename))
+        sh = shapefile.Reader(os.path.join(dsm_path, filename))
         left_list.append(round(sh.bbox[0], -3))
         bottom_list.append(round(sh.bbox[1], -3))
         right_list.append(round(sh.bbox[2], -3))
@@ -107,17 +134,6 @@ def create_lambert_coordinates():
     columns = ['Left', 'Bottom', 'Right', 'Top', 'Tif_file', 'Shp_file'])
     my_dataframe.to_csv('./data/lambert_coordinates.csv')
 
-
-create_lambert_coordinates()
+# For testing
+#create_lambert_coordinates()
 #create_list_of_shp_files()
-
-
-
-
-
-
-
-
-
-
-#sf = shapefile.Reader(fname)
