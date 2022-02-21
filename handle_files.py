@@ -5,6 +5,7 @@ from numpy import source
 import shapefile
 import pandas as pd
 import re
+from typing import Tuple
 
 """import rasterio
 import numpy as np
@@ -22,7 +23,7 @@ destination_dsm = "/Users/jari/DATA/Projects/DSM/"
 path_dtm = "/Users/jari/DATA/Projects/3D_House_DTM/"
 destination_dtm = "/Users/jari/DATA/Projects/DTM/"
 
-def copy_files(dsm):
+def copy_files(dsm:bool):
     """ copies files to DSM or DTM folder. 
     :dsm : a boolean value, if True DSM files are copied. Otherwise DTM files will be copied"""
 
@@ -56,70 +57,59 @@ def copy_files(dsm):
 
 # copy_files(False)
 
-def create_list_of_shp_files():
+def create_list_of_shp_files() -> Tuple[list, list]:
     """
-    list of list. The second list has two filenames: one for .shp file and the other for .tif.
-    These filenames will be written to a CSV file, so it's easy to open correct files later.
+    Searches all the files ending with .shp and adds those filenames to a list. Creates a sexond list that has tif-names.
+    :return : two lists. First one is containing all the .shp filenames and second one generated .tif files.
     """
+    # Creating a list of .shp files and sorting the list
     all_files = os.listdir(destination_dsm)
-    filelist=[]
-    pattern = "k[\d]+."
-    regex_compiled = re.compile(pattern)
-    
+    shp_files=[]
     for filename in all_files:
         if filename.endswith(".shp"):
-            filepair = []
-            result = regex_compiled.findall(filename)[0]
-            tif_file = f"DHMVIIDSMRAS1m_{result}tif"
-            filepair.append(filename)
-            filepair.append(tif_file)
-            filelist.append(filepair)
-    filelist = natsorted(filelist)
-    for i in filelist:
-        print(".shp:",i[0], ", .tif:", i[1])
-    return filelist
+            shp_files.append(filename)
+    shp_files = natsorted(shp_files)
+    
+    # Creating a list of .tif files in same order as .shp files
+    tif_files = [] 
+    pattern = "k[\d]+."
+    regex_compiled = re.compile(pattern)
+    for shp_file in shp_files:
+        result = regex_compiled.findall(shp_file)[0] 
+        tif_file = f"DHMVIIDSMRAS1m_{result}tif"
+        tif_files.append(tif_file)
+    
+    # Checking that generated .tif filename actually exists
+    for tif_file in tif_files:
+        if not(tif_file in all_files):
+            print("FILE DOESN'T EXISTS", tif_file)
+            
+    return shp_files, tif_files
 
 
 def create_lambert_coordinates():
-    #testauksen vuoksi luetaan vain yksi tiedosto
-    filelist = create_list_of_shp_files()
-    counter = 1
+    """
+    Creating lambert coordinates and saving it to a file
+    """
+    shp_files, tif_files = create_list_of_shp_files()
+    left_list, bottom_list, right_list, top_list = [], [], [], []
 
-    counter_list = []
-    left_list = []
-    bottom_list = []
-    right_list = []
-    top_list = []
-    tif_list = []
-    shpfile_list = []
-
-    for filename in filelist:
-        sh = shapefile.Reader(os.path.join(destination_dtm, filename[0]))
-        counter_list.append(counter)
+    # Read the boundaries and add them to lists
+    for filename in shp_files:
+        sh = shapefile.Reader(os.path.join(destination_dtm, filename))
         left_list.append(round(sh.bbox[0], -3))
         bottom_list.append(round(sh.bbox[1], -3))
         right_list.append(round(sh.bbox[2], -3))
         top_list.append(round(sh.bbox[3], -3))
-        tif_list.append(filename[1])
-        shpfile_list.append(filename[0])
-        counter += 1
 
-    my_dataframe = pd.DataFrame(list(zip(counter_list, left_list, bottom_list, right_list, top_list, tif_list, shpfile_list)), 
-    columns = ['counter', 'left', 'bottom', 'right', 'top', 'tif file', 'shpfile'])
-
+    # Create  a dataframe from the lists and save it to a CSV file  
+    my_dataframe = pd.DataFrame(list(zip(left_list, bottom_list, right_list, top_list, tif_files, shp_files)), 
+    columns = ['Left', 'Bottom', 'Right', 'Top', 'Tif_file', 'Shp_file'])
     my_dataframe.to_csv('./data/lambert_coordinates.csv')
-
-    print(counter_list[0])
-    print(left_list[0])
-    print(bottom_list[0])
-    print(right_list[0])
-    print(top_list[0])
-    print(tif_list[0])
-    print(shpfile_list[0])
 
 
 create_lambert_coordinates()
-
+#create_list_of_shp_files()
 
 
 
