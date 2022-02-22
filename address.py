@@ -8,6 +8,9 @@ from typing import Tuple
 import pandas as pd
 import os
 
+from shapely.geometry import Polygon
+import geopandas as gpd
+
 os.system('cls' if os.name == 'nt' else 'clear')
 
 #TODO The logic to ask the address from the user. Also could check that the given address is valid. There was a idea for autofill (the database should be loaded first)
@@ -52,13 +55,13 @@ def _json_to_coordinates(my_dict:dict) -> list:
     return the_coordinates
 
 
-def get_address() -> Tuple[dict, str]:
+def get_address() -> Tuple[list, str]:
     """ask a address from the user.
     :return :The coordinates in a list of coordinate pairs [[x1,y1], [x2,y2]...[xn, yn]] and the address as a string
     """
     street = "uitbreidingstraat"
     #street = "jaalaranta"
-    street_nbr = 10
+    street_nbr = 3
     post_code = 2840
     whole_address = f"{street} {street_nbr}, {post_code}".upper()
 
@@ -70,16 +73,13 @@ def get_address() -> Tuple[dict, str]:
             "huisnummer": street_nbr,
         },
     )
-    print("STATUS CODE:", address.status_code)
+    # print("STATUS CODE:", address.status_code)
     request = address.json()
 
-    print(request)
     my_dict = dict(request)
-    print("my_dict_keys", my_dict.keys())
     warnings = my_dict.get('warnings')
 
     # TODO Check that if there is only one address. If several addresses are found then it's necessary to ask furher details
-
 
     if address.status_code != 200 or len(warnings) >0:
         print("Error when reading the address. Pls try again")
@@ -87,6 +87,10 @@ def get_address() -> Tuple[dict, str]:
     else:
         return _json_to_coordinates(my_dict), whole_address
 
-print(get_address())
+#coordinates = []
+#address = ""
+#coordinates, address = get_address()
+#
+#print("COORDINATES (get_address): ", coordinates)
 
 

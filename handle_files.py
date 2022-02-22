@@ -16,7 +16,6 @@ import json
 # clear the screen
 os.system('cls' if os.name == 'nt' else 'clear')
 
-
 def write_paths():
     """" 
     This function creates a JSON file that can be used later for reading the
@@ -31,6 +30,7 @@ def write_paths():
     json_string = json.dumps(directories)
     with open('./data/dsm_and_dtm_directories', 'w') as outfile:
         outfile.write(json_string)
+
 
 
 def read_paths()-> Tuple[str,str,str,str]:
@@ -80,8 +80,6 @@ def copy_files(dsm:bool):
                 counter += 1
     print("Total count of files:", counter)
 
-copy_files(False)
-
 def create_list_of_shp_files() -> Tuple[list, list]:
     """
     Searches all the files ending with .shp and adds those filenames to a list. Creates a sexond list that has tif-names.
@@ -97,20 +95,28 @@ def create_list_of_shp_files() -> Tuple[list, list]:
     shp_files = natsorted(shp_files)
     
     # Creating a list of .tif files in same order as .shp files
-    tif_files = [] 
+    dsm_tif_files, dtm_tif_files = [], []
+
     pattern = "k[\d]+."
     regex_compiled = re.compile(pattern)
     for shp_file in shp_files:
+
         result = regex_compiled.findall(shp_file)[0] 
-        tif_file = f"DHMVIIDSMRAS1m_{result}tif"
-        tif_files.append(tif_file)
-    
+        dsm_tif_file = f"DHMVIIDSMRAS1m_{result}tif"
+        dsm_tif_files.append(dsm_tif_file)
+        dtm_tif_file = f"DHMVIIDTMRAS1m_{result}tif"
+        dtm_tif_files.append(dtm_tif_file)
+
     # Checking that generated .tif filename actually exists
-    for tif_file in tif_files:
-        if not(tif_file in all_files):
-            print("FILE DOESN'T EXISTS", tif_file)
+    for dsm_tif_file in dsm_tif_files:
+        if not(dsm_tif_file in all_files):
+            print("FILE DOESN'T EXISTS", dsm_tif_file)
+    all_dtm_files = os.listdir(dtm_path)
+    for dtm_tif_file in all_dtm_files:
+        if not(dtm_tif_file in all_dtm_files):
+            print("FILE DOESN'T EXISTS", dtm_tif_file)
             
-    return shp_files, tif_files
+    return shp_files, dsm_tif_files, dtm_tif_files
 
 
 def create_lambert_coordinates():
@@ -118,7 +124,7 @@ def create_lambert_coordinates():
     Creating lambert coordinates and saving it to a file
     """
     dsm_path, dtm_path, dsm_source, dtm_source = read_paths()
-    shp_files, tif_files = create_list_of_shp_files()
+    shp_files, dsm_tif_files, dtm_tif_files = create_list_of_shp_files()
     left_list, bottom_list, right_list, top_list = [], [], [], []
 
     # Read the boundaries and add them to lists
@@ -130,10 +136,9 @@ def create_lambert_coordinates():
         top_list.append(round(sh.bbox[3], -3))
 
     # Create  a dataframe from the lists and save it to a CSV file  
-    my_dataframe = pd.DataFrame(list(zip(left_list, bottom_list, right_list, top_list, tif_files, shp_files)), 
-    columns = ['Left', 'Bottom', 'Right', 'Top', 'Tif_file', 'Shp_file'])
+    my_dataframe = pd.DataFrame(list(zip(left_list, bottom_list, right_list, top_list, dsm_tif_files, dtm_tif_files)), 
+    columns = ['Left', 'Bottom', 'Right', 'Top', 'DSM_file', 'DTM_file'])
     my_dataframe.to_csv('./data/lambert_coordinates.csv')
 
-# For testing
-#create_lambert_coordinates()
-#create_list_of_shp_files()
+create_lambert_coordinates()
+
