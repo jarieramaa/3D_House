@@ -65,6 +65,7 @@ def get_address(values : list, test = True) -> Tuple[list, str]:
     """ask a address from the user.
     :return :The coordinates in a list of coordinate pairs [[x1,y1], [x2,y2]...[xn, yn]] and the address as a string
     """
+    street, post_code, street_nbr = values[2], values[1], values[3]
 
     if test :
         street = "Klipgaardestraat"
@@ -75,11 +76,6 @@ def get_address(values : list, test = True) -> Tuple[list, str]:
         # Tildonksesteenweg 71 3020 Herent - horisontal split - nice house!!
         # Klipgaardestraat 9 3473 Kortenaken - 4 ways split
 
-    street, post_code, street_nbr = values[2], values[1], values[3]
-
-
-    #whole_address = f"{street} {street_nbr}, {post_code}".upper()
-
     address = requests.get(
         "https://api.basisregisters.vlaanderen.be/v1/adresmatch",
         params={
@@ -88,15 +84,13 @@ def get_address(values : list, test = True) -> Tuple[list, str]:
             "huisnummer": street_nbr,
         },
     )
-    # print("STATUS CODE:", address.status_code)
     request = address.json()
 
     my_dict = dict(request)
     warnings = my_dict.get('warnings')
 
     # TODO Check that if there is only one address. If several addresses are found then it's necessary to ask furher details
-
-    if address.status_code != 200 or len(warnings) >0:
+    if address.status_code != 200 or len(warnings) > 0:
         print("Error when reading the address. Pls try again")
         return None, None
     else:
