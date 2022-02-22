@@ -43,6 +43,8 @@ def _json_to_coordinates(my_dict:dict) -> list:
     # take one building and get details, there is be a url
     building = block_building.get('gebouw')
     url_to_house = building.get('detail')
+    print("="*100)
+    print("url to house",url_to_house)
 
     # Let's get some details from this house
     house = requests.get(url_to_house)
@@ -50,20 +52,33 @@ def _json_to_coordinates(my_dict:dict) -> list:
 
     # convert the house_specs to DataFrame and get polygon coordinates -column
     house_df = pd.json_normalize(house_specs)
+    print("="*100)
+    print("house_df",url_to_house)
     the_coordinates = house_df.loc[0,'geometriePolygoon.polygon.coordinates']
+    print("="*100)
+    print("the_coordinates",url_to_house)
 
     return the_coordinates
 
 
-def get_address() -> Tuple[list, str]:
+def get_address(values : list, test = True) -> Tuple[list, str]:
     """ask a address from the user.
     :return :The coordinates in a list of coordinate pairs [[x1,y1], [x2,y2]...[xn, yn]] and the address as a string
     """
-    street = "uitbreidingstraat"
-    #street = "jaalaranta"
-    street_nbr = 3
-    post_code = 2840
-    whole_address = f"{street} {street_nbr}, {post_code}".upper()
+
+    if test :
+        street = "Klipgaardestraat"
+        #street = "jaalaranta"
+        street_nbr = 9
+        post_code = 3473
+        # uitbreidingstraat 3 2840 haren - original
+        # Tildonksesteenweg 71 3020 Herent - horisontal split - nice house!!
+        # Klipgaardestraat 9 3473 Kortenaken - 4 ways split
+
+    street, post_code, street_nbr = values[2], values[1], values[3]
+
+
+    #whole_address = f"{street} {street_nbr}, {post_code}".upper()
 
     address = requests.get(
         "https://api.basisregisters.vlaanderen.be/v1/adresmatch",
@@ -83,9 +98,9 @@ def get_address() -> Tuple[list, str]:
 
     if address.status_code != 200 or len(warnings) >0:
         print("Error when reading the address. Pls try again")
-        return None
+        return None, None
     else:
-        return _json_to_coordinates(my_dict), whole_address
+        return _json_to_coordinates(my_dict)
 
 #coordinates = []
 #address = ""
