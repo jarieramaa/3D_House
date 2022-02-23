@@ -62,6 +62,7 @@ def get_polygon(coordinates:list) -> Polygon:
    polygon = gpd.GeoDataFrame(index=[0], crs='epsg:31370', geometry=[polygon])
    return polygon
 
+
 def mask_tif_files(dsm_tif, dtm_tif , polygon: Polygon) -> Tuple[rasterio.io.DatasetReader, rasterio.io.DatasetReader]:
     """This method masks the tif files with the polygon given as a parameter.
     :dsm_tif: DSM tif file

@@ -5,7 +5,6 @@ import os
 
 import manage_tif
 import show_3d_house
-import address
 import address_GUI
 
 
@@ -16,10 +15,14 @@ os.system('cls' if os.name == 'nt' else 'clear')
 
 def main():
     #coordinates, address_title = address.get_address()
-    coordinates, address_title = address_GUI.get_address(False)
+    address_gui = address_GUI.Address_GUI()
 
+    coordinates, address_title =  address_gui.get_address(True)
+    address_gui.close_window()
+    
     dsm_tif, dtm_tif  = manage_tif.get_tif(coordinates)
     polygon = manage_tif.get_polygon(coordinates)
+    
     raster_chm = manage_tif.mask_tif_files(dsm_tif,dtm_tif,polygon)
     show_3d_house.show_3d_house(address_title, raster_chm)
 
