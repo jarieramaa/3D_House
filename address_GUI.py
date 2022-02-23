@@ -7,6 +7,8 @@ import PySimpleGUI as sg
 
 import address
  
+
+
 sg.theme('DarkAmber')   # Add a touch of color
 # All the stuff inside your window.
 txt_size = (16, 1)
@@ -19,7 +21,7 @@ def get_address(test = False):
 
     layout = [  [sg.Text('')],
         [sg.Text('Please enter the address information:', font=font)], 
-                [sg.Text('City/town', size=(txt_size), font=font), sg.InputText('karijoki', size=20, font=font)],
+                [sg.Text('City/town', size=(txt_size), font=font), sg.InputText(size=20, font=font)],
                 [sg.Text('Post code', size=(txt_size), font=font), sg.InputText(size= 4, font = font)],
                 [sg.Text('Street', size=(txt_size), font=font), sg.InputText(size = 20, font = font)],
                 [sg.Text('Street number', size=(txt_size), font=font), sg.InputText(size = 4, font = font)],
@@ -31,7 +33,6 @@ def get_address(test = False):
     window = sg.Window('Input address', layout)
     # Event Loop to process "events" and get the "values" of the inputs
     while True:
-        print("jsdfjksd")
         event, values = window.read()
         if event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
             break

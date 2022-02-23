@@ -24,6 +24,7 @@ def _json_to_coordinates(my_dict:dict) -> list:
 
     # adresMatches / warnings, let's continue with adresMatches
     addresMatches = my_dict.get('adresMatches')
+    print("addresMatches", addresMatches)
 
     # Take the first address from the list (there is only one)
     # and convert it to pandas DataFrame
@@ -32,15 +33,18 @@ def _json_to_coordinates(my_dict:dict) -> list:
     # the first row of the DataFrame
     row_1 = my_df.iloc[0]
 
-    # address_objects list, get the 'details' from the dictionary. There is a url.
+    # address_objects list, get the 'details' from the dictionary. There is an url.
     address_objects = row_1['adresseerbareObjecten']
+    print(len(address_objects))
+    print("address_objects: ", address_objects)
+    print("=="*20)
     detail_url = address_objects[0].get('detail')
 
     # New reguest to obtain some more detailed information about building block
     address = requests.get(detail_url)
     block_building = address.json()
 
-    # take one building and get details, there is be a url
+    # take one building and get details, there is be an url
     building = block_building.get('gebouw')
     url_to_house = building.get('detail')
     print("="*100)
@@ -50,6 +54,8 @@ def _json_to_coordinates(my_dict:dict) -> list:
     house = requests.get(url_to_house)
     house_specs = house.json()
 
+
+
     # convert the house_specs to DataFrame and get polygon coordinates -column
     house_df = pd.json_normalize(house_specs)
     print("="*100)
@@ -58,22 +64,38 @@ def _json_to_coordinates(my_dict:dict) -> list:
     print("="*100)
     print("the_coordinates",url_to_house)
 
+    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    #       C A P A K E Y   C O O R D I N A T E S
+    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    # get the CAPAKEY for checking out the living area information
+    print(">>>>>>> House specs", house_specs)
+    print("="*100)
+    print("get details from house", house_specs.get('percelen'))
+    house_list = house_specs.get('percelen')
+    my_dict2 = dict(house_list[0])
+    my_url2 = my_dict2.get('detail')
+    #take the rest of the url address after /percelen and get the CAPAKEY
+    capakey = my_url2.split('/')[-1]
+    print("CAPAKEY", capakey)
+    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
     return the_coordinates
 
 
-def get_address(values : list, test = True) -> Tuple[list, str]:
+def get_address(values : list, test = False) -> Tuple[list, str]:
     """ask a address from the user.
     :return :The coordinates in a list of coordinate pairs [[x1,y1], [x2,y2]...[xn, yn]] and the address as a string
     """
     street, post_code, street_nbr = values[2], values[1], values[3]
 
     if test :
-        street = "Klipgaardestraat"
-        #street = "jaalaranta"
-        street_nbr = 9
-        post_code = 3473
+        street = "Koningstraat"
+        street_nbr = 44
+        post_code = 1000
         # uitbreidingstraat 3 2840 haren - original
         # Tildonksesteenweg 71 3020 Herent - horisontal split - nice house!!
+        # Regentschapsstraat 44 , Brussel 1000 -- does not work
         # Klipgaardestraat 9 3473 Kortenaken - 4 ways split
 
     address = requests.get(
@@ -87,6 +109,7 @@ def get_address(values : list, test = True) -> Tuple[list, str]:
     request = address.json()
 
     my_dict = dict(request)
+    print(my_dict)
     warnings = my_dict.get('warnings')
 
     # TODO Check that if there is only one address. If several addresses are found then it's necessary to ask furher details
@@ -102,4 +125,5 @@ def get_address(values : list, test = True) -> Tuple[list, str]:
 #
 #print("COORDINATES (get_address): ", coordinates)
 
+get_address("akffj", True)
 
