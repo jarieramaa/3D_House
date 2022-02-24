@@ -1,3 +1,5 @@
+""" This module contains the methods that are needed for modifying the tif files and their coordinates."""
+
 
 from multiprocessing.connection import wait
 from typing import Tuple
@@ -7,12 +9,13 @@ import geopandas as gpd
 import rasterio
 import os
 from rasterio.mask import mask
+import matplotlib.pyplot as plt
 
 import handle_files
 
 
 #TODO these coordinates are for testing only
-coordinates = [[[152063.6619006768, 196432.9290343821], [152064.33991667628, 196435.54989838228], [152058.34490867704, 196436.96609038487], [152055.61902067065, 196425.62989837676], [152061.46964468062, 196424.2372583747], [152061.4747646749, 196424.23623437434], [152063.6619006768, 196432.9290343821]]]
+#coordinates = [[[152063.6619006768, 196432.9290343821], [152064.33991667628, 196435.54989838228], [152058.34490867704, 196436.96609038487], [152055.61902067065, 196425.62989837676], [152061.46964468062, 196424.2372583747], [152061.4747646749, 196424.23623437434], [152063.6619006768, 196432.9290343821]]]
 
 
 def _convert_coordinates(coordinates:list) -> Tuple[list, list]:
@@ -60,6 +63,8 @@ def get_polygon(coordinates:list) -> Polygon:
    polygon = Polygon(zip(x, y))
    print(zip(x,y))
    polygon = gpd.GeoDataFrame(index=[0], crs='epsg:31370', geometry=[polygon])
+   polygon.plot()
+   plt.show()
    return polygon
 
 

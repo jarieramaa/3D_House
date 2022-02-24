@@ -14,10 +14,11 @@ os.system('cls' if os.name == 'nt' else 'clear')
 #coordinates = [[[152063.6619006768, 196432.9290343821], [152064.33991667628, 196435.54989838228], [152058.34490867704, 196436.96609038487], [152055.61902067065, 196425.62989837676], [152061.46964468062, 196424.2372583747], [152061.4747646749, 196424.23623437434], [152063.6619006768, 196432.9290343821]]]
 
 def main():
-    #coordinates, address_title = address.get_address()
+    """
+    This function is called when the program is run."""
     address_gui = address_GUI.Address_GUI()
 
-    coordinates, address_title =  address_gui.get_address(True)
+    coordinates, address_title =  address_gui.get_address(False)
     address_gui.close_window()
     
     dsm_tif, dtm_tif  = manage_tif.get_tif(coordinates)
@@ -26,8 +27,8 @@ def main():
     raster_chm = manage_tif.mask_tif_files(dsm_tif,dtm_tif,polygon)
     show_3d_house.show_3d_house(address_title, raster_chm)
 
-
-main()
+if __name__ == "__main__":
+    main()
 
 
 

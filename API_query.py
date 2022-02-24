@@ -4,13 +4,15 @@ Get the address and coordinates for the house/apartment that you want to see.
 """
 
 from audioop import add
+from anyio import CapacityLimiter
 import requests
 from typing import Tuple
 import pandas as pd
 import os
-
 from shapely.geometry import Polygon
 import geopandas as gpd
+
+import address
 
 os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -18,8 +20,12 @@ os.system('cls' if os.name == 'nt' else 'clear')
 # TODO the conversion to coordinates is quite long, maybe it could be a separate module, especially if there is more logic for address (see above)
 
 class API_query:
+    """
+    This class contains all methods that are needed for the API interaction.
+    """
 
     def __init__(self, test = False):
+        """Constructor"""
         self.test = test
         self.address =  requests.models.Response
         self.address_dict = dict
@@ -88,16 +94,19 @@ class API_query:
         return capakey
 
 
-    def get_address(self, values : list, test = False) -> Tuple[list, str]:
+    def get_address(self, address : address, test = False) -> Tuple[list, str]:
         """ask a address from the user.
-        :return :The coordinates in a list of coordinate pairs [[x1,y1], [x2,y2]...[xn, yn]] and the address as a string
+        :return : The coordinates in a list of coordinate pairs [[x1,y1], [x2,y2]...[xn, yn]] 
+        :return : The address as a string
         """
-        street, post_code, street_nbr = values[2], values[1], values[3]
+
+        #TODO city is not yet used in the query. Should it be added to the query
+        street, street_nbr, post_code  = address.street, address.street_nbr, address.post_code
 
         if test :
-            street = "Regentschapsstraat"
-            street_nbr = 44
-            post_code = 1000
+            street = "Tildonksesteenweg"
+            street_nbr = 71
+            post_code = 3020
             # uitbreidingstraat 3 2840 haren - original
             # Tildonksesteenweg 71 3020 Herent - horisontal split - nice house!!
             # Regentschapsstraat 44 , Brussel 1000 -- does not work
@@ -112,15 +121,10 @@ class API_query:
             },
         )
 
-        print("ADDRESS TYPE", type(self.address))
-
         request = self.address.json()
-
         self.address_dict = dict(request)
-        print(self.address_dict)
         warnings = self.address_dict.get('warnings')
 
-        # TODO Check that if there is only one address. If several addresses are found then it's necessary to ask furher details
         if self.address.status_code != 200 or len(warnings) > 0:
             print("Error when reading the address. Pls try again")
             return False
