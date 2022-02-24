@@ -26,10 +26,10 @@ class API_query:
 
     def __init__(self, test = False):
         """Constructor"""
-        self.test = test
-        self.address =  requests.models.Response
+        self._test = test
+        self._address_reguest =  requests.models.Response
         self.address_dict = dict
-        self.house_specs = dict
+        self._house_specs = dict
 
     def get_coordinates(self) -> Tuple[list, bool]:
         """ Once we have a valid address, it's possible to get the coordinates from basisregister.vlaanderen.be service.
@@ -63,8 +63,8 @@ class API_query:
         detail_url = address_objects[0].get('detail')
 
         # New reguest to obtain some more detailed information about building block
-        address = requests.get(detail_url)
-        block_building = address.json()
+        address_req = requests.get(detail_url)
+        block_building = address_req.json()
 
         # take one building and get details, there is be an url
         building = block_building.get('gebouw')
@@ -78,6 +78,7 @@ class API_query:
         # convert the house_specs to DataFrame and get polygon coordinates -column
         house_df = pd.json_normalize(house_specs)
         the_coordinates = house_df.loc[0,'geometriePolygoon.polygon.coordinates']
+        #self.address.coordinates = the_coordinates
         return the_coordinates, True
 
     def get_capakey(self) -> str:
@@ -94,14 +95,15 @@ class API_query:
         return capakey
 
 
-    def get_address(self, address : address, test = False) -> Tuple[list, str]:
+    def get_address(self, address_data : address, test = False) -> Tuple[list, str]:
         """ask a address from the user.
         :return : The coordinates in a list of coordinate pairs [[x1,y1], [x2,y2]...[xn, yn]] 
         :return : The address as a string
         """
 
         #TODO city is not yet used in the query. Should it be added to the query
-        street, street_nbr, post_code  = address.street, address.street_nbr, address.post_code
+        street, street_nbr, post_code = "", "", ""
+        street, street_nbr, post_code  = address_data.street, address_data.street_nbr, address_data.post_code
 
         if test :
             street = "Tildonksesteenweg"
@@ -112,23 +114,27 @@ class API_query:
             # Regentschapsstraat 44 , Brussel 1000 -- does not work
             # Klipgaardestraat 9 3473 Kortenaken - 4 ways split
 
-        self.address = requests.get(
-            "https://api.basisregisters.vlaanderen.be/v1/adresmatch",
-            params={
-                "postcode": post_code,
-                "straatnaam": street,
-                "huisnummer": street_nbr,
-            },
+        print("street: ", street)
+        print("street_nbr: ", street_nbr)
+        print("post_code: ", post_code)
+
+
+        self._address_reguest = requests.get(
+            "https://api.basisregisters.vlaanderen.be/v1/adresmatch", params={"postcode": post_code, "straatnaam": street, "huisnummer": street_nbr},
         )
-
-        request = self.address.json()
+        request = self._address_reguest.json()
         self.address_dict = dict(request)
+        print("address_dict", self.address_dict)
         warnings = self.address_dict.get('warnings')
-
-        if self.address.status_code != 200 or len(warnings) > 0:
+        print("Warnings",warnings)
+        if self._address_reguest.status_code != 200 or len(warnings) > 0:
+            print("status code", self._address_reguest.status_code)
+            print("warnings", warnings)
             print("Error when reading the address. Pls try again")
+            print("API_query.get_address palauttaa False")
             return False
         else:
+            print("API_query.get_address palauttaa True")
             return True
 
 

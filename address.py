@@ -10,7 +10,7 @@ class Data:
         self._street = ""
         self._street_nbr = ""
         self._post_code = ""
-        self._city = ""  # Municipality, this field could be added to the search query
+        self._municipality = ""  # Municipality, this field could be added to the search query
         # TODO https://docs.basisregisters.vlaanderen.be/docs/api-documentation.html#operation/ListAddresses MUNICIPALITY
         self._window = window
         self._validated = True
@@ -41,7 +41,7 @@ class Data:
         """ Getter for post_code """
         return self._post_code
 
-    @street_nbr.setter
+    @post_code.setter
     def post_code(self, value: str) -> None:
         """ Setter for post_code """
         if not value.isdigit:
@@ -55,14 +55,14 @@ class Data:
             sg.popup_ok("Post code must be 4 digits long", font=("Arial", 14))
 
     @property # CITY
-    def city(self) -> str:
+    def municipality(self) -> str:
         """ Getter for city """
-        return self._city
+        return self._municipality
 
-    @street_nbr.setter
-    def city(self, value: str) -> None:
+    @municipality.setter
+    def municipality(self, value: str) -> None:
         """ Setter for city """
-        self._city = value
+        self._municipality = value
     
     @property # VALIDATED (if address is ok)
     def validated(self) -> bool:

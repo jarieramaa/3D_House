@@ -54,25 +54,32 @@ class Address_GUI:
             self.address_data.street = values[0]
             self.address_data.street_nbr = values[1]
             self.address_data.post_code = values[2]
-            self.address_data.city = values[3]
+            self.address_data.municipality = values[3]
+            print("self.address_data.street: ", self.address_data.street)
+            print("self.address_data.street_nbr: ", self.address_data.street_nbr)
+            print("self.address_data.post_code: ", self.address_data.post_code)
+            print("self.address_data.municipality: ", self.address_data.municipality)
+
+
             if event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
                 break
             if self.address_data.validated == False:
                 continue
-            if event == 'Show':
-                print("nyt tehdään haku!!")
-                continue
-            if event == 'Street':
-                print("Street vaihdettu!")
-                continue
+            print("######## api_query.get_address() ALKAA ######## ")
             is_successful  = api_query.get_address(self.address_data, test)
+            print("######## api_query.get_address() PÄÄTTYY ######## ")
+            print("is_successful = ", is_successful)
+            print("EVENT:",event, " ---- is_successful", is_successful)
             if event =='Ok' and is_successful:
                 the_coordinates, is_successful = api_query.get_coordinates()
+                print("address_GUI, return value from api_query.get_coordinates()")
+                print("the_coordinates", the_coordinates)
+                print("is_successful", is_successful)
                 if is_successful == False or the_coordinates == (None, None):
                     sg.popup_ok("No address found! Please, make sure that the address is in Flanders.",font=font)
                     continue
                 else:
-                    whole_address = f"{self.address_data.street} {self.address_data.street_nbr}, {self.address_data.post_code}, {self.address_data.city}".upper()
+                    whole_address = f"{self.address_data.street} {self.address_data.street_nbr}, {self.address_data.post_code}, {self.address_data.municipality}".upper()
                     return the_coordinates, whole_address
             else:
                 sg.popup_ok("No address found! \nPlease, make sure that the address is in Flanders.",font=font)
