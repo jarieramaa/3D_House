@@ -27,7 +27,7 @@ class Address_GUI:
         api_query = API_query.API_query(test)
         font=("Arial", 14)
         txt_size = (16, 1)
-        l =[] 
+        #my_list =['first item', 'second item', 'third item'] 
 
         layout = [  [sg.Text('')],
             [sg.Text('Please enter the address information:', font=font)], 
@@ -36,8 +36,9 @@ class Address_GUI:
                     [sg.Text('Post code', size=(txt_size), font=font), sg.InputText(size= 4, font = font)],
                     [sg.Text('City/town', size=(txt_size), font=font), sg.InputText(size=20, font=font)],
                     [sg.Text('')] , 
-                    [sg.Button('Show', font= font)],
-                    [sg.Listbox(l, size=(70, 20))],
+                # TODO add a button to show all the possible addresses OR TechTalk
+                #   [sg.Button('Show', font= font)],
+                # [sg.Listbox(my_list, size=(70, 20), font = font)],
 
                     [sg.Button('Ok', font= font), sg.Button('Cancel', font= font)]
                  ]
