@@ -35,7 +35,9 @@ class Address_GUI:
                     [sg.Text('Street number', size=(txt_size), font=font), sg.InputText(size = 4, font = font)],
                     [sg.Text('Post code', size=(txt_size), font=font), sg.InputText(size= 4, font = font)],
                     [sg.Text('City/town', size=(txt_size), font=font), sg.InputText(size=20, font=font)],
-                    [sg.Text('')] , 
+                    [sg.Text('')] ,
+                    [sg.Checkbox('Draw Polygon', default=True)],
+                    [sg.Text('')] ,
                 # TODO add a button to show all the possible addresses OR TechTalk
                 #   [sg.Button('Show', font= font)],
                 # [sg.Listbox(my_list, size=(70, 20), font = font)],
@@ -55,10 +57,12 @@ class Address_GUI:
             self.address_data.street_nbr = values[1]
             self.address_data.post_code = values[2]
             self.address_data.municipality = values[3]
+            draw_polygon = values[4]
             print("self.address_data.street: ", self.address_data.street)
             print("self.address_data.street_nbr: ", self.address_data.street_nbr)
             print("self.address_data.post_code: ", self.address_data.post_code)
             print("self.address_data.municipality: ", self.address_data.municipality)
+            print("draw_polygon: ", draw_polygon)
 
 
             if event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
@@ -80,7 +84,7 @@ class Address_GUI:
                     continue
                 else:
                     whole_address = f"{self.address_data.street} {self.address_data.street_nbr} {self.address_data.post_code} {self.address_data.municipality}".upper()
-                    return the_coordinates, whole_address
+                    return the_coordinates, whole_address, draw_polygon
             else:
                 sg.popup_ok("No address found! \nPlease, make sure that the address is in Flanders.",font=font)
                 continue

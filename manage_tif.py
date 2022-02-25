@@ -10,6 +10,7 @@ import rasterio
 import os
 from rasterio.mask import mask
 import matplotlib.pyplot as plt
+from threading import Thread
 
 import handle_files
 
@@ -55,19 +56,6 @@ def get_tif(coordinates) -> Tuple[str, str]:
 
     return dsm_tif, dtm_tif
 
-
-def get_polygon(coordinates:list) -> Polygon:
-   """This polygon is needed for masking the .tif files
-   :param: list of coordinates [[x1,y1], [x2,y2]...[xn, yn]]"""
-   x, y = _convert_coordinates(coordinates)
-   polygon = Polygon(zip(x, y))
-   print(zip(x,y))
-   polygon = gpd.GeoDataFrame(index=[0], crs='epsg:31370', geometry=[polygon])
-   polygon.plot()
-   plt.show()
-   return polygon
-
-
 def mask_tif_files(dsm_tif, dtm_tif , polygon: Polygon) -> Tuple[rasterio.io.DatasetReader, rasterio.io.DatasetReader]:
     """This method masks the tif files with the polygon given as a parameter.
     :dsm_tif: DSM tif file
@@ -78,7 +66,29 @@ def mask_tif_files(dsm_tif, dtm_tif , polygon: Polygon) -> Tuple[rasterio.io.Dat
     # create a mask from the polygon
     masked_DSM, masked_transform_DSM = mask(dataset=dsm_tif, shapes=polygon.geometry, crop=True, pad=True)
     masked_DTM, masked_transform_DTM = mask(dataset=dtm_tif, shapes=polygon.geometry, crop=True, pad=True)  
-
     raster_CHM = masked_DSM - masked_DTM # calculate the CHM
-
     return raster_CHM
+
+def get_polygon(coordinates:list, draw_polygon:bool) -> Polygon:
+   """This polygon is needed for masking the .tif files
+   :param: list of coordinates [[x1,y1], [x2,y2]...[xn, yn]]"""
+   x, y = _convert_coordinates(coordinates)
+   polygon = Polygon(zip(x, y))
+   print(zip(x,y))
+   polygon = gpd.GeoDataFrame(index=[0], crs='epsg:31370', geometry=[polygon])
+   if draw_polygon:
+      polygon.plot()
+      plt.show()
+   return polygon
+
+"""class PolygonDraw(Thread):
+   def __init__(self, polygon):
+      Thread.__init__(self)
+      self.polygon = polygon
+      print("Thread initialized")
+      #self.draw_polygon(polygon)
+
+   def run(self):
+      print("Thread running")
+      self.polygon.plot()
+      plt.show()"""

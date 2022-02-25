@@ -18,11 +18,11 @@ def main():
     This function is called when the program is run."""
     address_gui = address_GUI.Address_GUI()
 
-    coordinates, address_title =  address_gui.get_address(False)
+    coordinates, address_title, draw_polygon =  address_gui.get_address(True)
     address_gui.close_window()
     
     dsm_tif, dtm_tif  = manage_tif.get_tif(coordinates)
-    polygon = manage_tif.get_polygon(coordinates)
+    polygon = manage_tif.get_polygon(coordinates, draw_polygon)
     
     raster_chm = manage_tif.mask_tif_files(dsm_tif,dtm_tif,polygon)
     show_3d_house.show_3d_house(address_title, raster_chm)
