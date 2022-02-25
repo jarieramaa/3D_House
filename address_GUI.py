@@ -64,7 +64,6 @@ class Address_GUI:
             print("self.address_data.municipality: ", self.address_data.municipality)
             print("draw_polygon: ", draw_polygon)
 
-
             if event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
                 break
             if self.address_data.validated == False:
@@ -76,15 +75,14 @@ class Address_GUI:
             print("EVENT:",event, " ---- is_successful", is_successful)
             if event =='Ok' and is_successful:
                 the_coordinates, is_successful = api_query.get_coordinates()
-                print("address_GUI, return value from api_query.get_coordinates()")
-                print("the_coordinates", the_coordinates)
-                print("is_successful", is_successful)
+                self.address_data.coordinates = the_coordinates
+                print("GUI.get_address: address.coordinates: ", self.address_data.coordinates)
                 if is_successful == False or the_coordinates == (None, None):
                     sg.popup_ok("No address found! Please, make sure that the address is in Flanders.",font=font)
                     continue
                 else:
-                    whole_address = f"{self.address_data.street} {self.address_data.street_nbr} {self.address_data.post_code} {self.address_data.municipality}".upper()
-                    return the_coordinates, whole_address, draw_polygon
+                    print("\n\n>>>>>>> self.address_data", self.address_data.coordinates)
+                    return self.address_data, draw_polygon
             else:
                 sg.popup_ok("No address found! \nPlease, make sure that the address is in Flanders.",font=font)
                 continue
