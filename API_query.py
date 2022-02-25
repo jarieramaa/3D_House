@@ -103,7 +103,7 @@ class API_query:
 
         #TODO city is not yet used in the query. Should it be added to the query
         street, street_nbr, post_code = "", "", ""
-        street, street_nbr, post_code  = address_data.street, address_data.street_nbr, address_data.post_code
+        street, street_nbr, post_code, municipality = address_data.street, address_data.street_nbr, address_data.post_code, address_data.municipality
 
         if test :
             street = "Tildonksesteenweg"
@@ -117,11 +117,18 @@ class API_query:
         print("street: ", street)
         print("street_nbr: ", street_nbr)
         print("post_code: ", post_code)
-
+        print("municipality: ", municipality)
 
         self._address_reguest = requests.get(
-            "https://api.basisregisters.vlaanderen.be/v1/adresmatch", params={"postcode": post_code, "straatnaam": street, "huisnummer": street_nbr},
+            "https://api.basisregisters.vlaanderen.be/v1/adresmatch", 
+            params={
+                "postcode": post_code,
+                "straatnaam": street,
+                "huisnummer": street_nbr,
+                "gemeentenaam": municipality
+                },
         )
+
         request = self._address_reguest.json()
         self.address_dict = dict(request)
         print("address_dict", self.address_dict)

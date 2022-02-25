@@ -47,12 +47,14 @@ class Data:
         if not value.isdigit:
             self._validated = False
             sg.popup_ok("Post code should be 4 digits, \nno characters are allowed.", font=("Arial", 14))
-        if len(value) == 4:
-            self._post_code = value
-            self._validated = True
-        else:
+        # value has to be either four or zero digit
+        if value != None and (len(value) != 4 and len(value) != 0):
             self._validated = False
             sg.popup_ok("Post code must be 4 digits long", font=("Arial", 14))
+        else:
+            self._post_code = value
+            self._validated = True
+            
 
     @property # CITY
     def municipality(self) -> str:

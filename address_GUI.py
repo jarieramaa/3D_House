@@ -79,7 +79,7 @@ class Address_GUI:
                     sg.popup_ok("No address found! Please, make sure that the address is in Flanders.",font=font)
                     continue
                 else:
-                    whole_address = f"{self.address_data.street} {self.address_data.street_nbr}, {self.address_data.post_code}, {self.address_data.municipality}".upper()
+                    whole_address = f"{self.address_data.street} {self.address_data.street_nbr} {self.address_data.post_code} {self.address_data.municipality}".upper()
                     return the_coordinates, whole_address
             else:
                 sg.popup_ok("No address found! \nPlease, make sure that the address is in Flanders.",font=font)
