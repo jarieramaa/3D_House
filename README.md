@@ -1,6 +1,6 @@
 # 3D_House
 
-A solution to model a any house in 3D model. The only input is the address.
+This program shows 3D model of the house to any given address in Flanders. 
 
 Challenge:
 * Solo project: Jari Erämaa
@@ -9,6 +9,8 @@ Challenge:
 * Nice to have: speed optimization, extra information like living area, better visualization
 
 # Description
+
+The application takes 
 
 This solution presents a house as a 3D model. As an input an address is needed (Flanders). 
 
@@ -21,7 +23,12 @@ Based to that address the solution selects correct lidar (light detection and ra
 
 # Usage
 
-There is a graphical user interface for the user. 
+Start program by command 'python main.py'. 
+
+A graphical user interface will open. Enter any address in Flanders and press 'Ok'- button.
+
+
+
 
 # Visuals
 

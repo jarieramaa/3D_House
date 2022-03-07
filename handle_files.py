@@ -14,40 +14,41 @@ import json
 
 
 # clear the screen
-os.system('cls' if os.name == 'nt' else 'clear')
+os.system("cls" if os.name == "nt" else "clear")
+
 
 def write_paths():
-    """" 
+    """ "
     This function creates a JSON file that can be used later for reading the
     paths. https://stackabuse.com/reading-and-writing-json-to-a-file-in-python/
     """
     directories = {
-            "dsm_source" : "/Users/jari/DATA/Projects/3D_House_DSM/",
-            "dsm_path" : "/Users/jari/DATA/Projects/DSM/",
-            "dtm_source" : "/Users/jari/DATA/Projects/3D_House_DTM/",
-            "dtm_path" : "/Users/jari/DATA/Projects/DTM/"
-            }
+        "dsm_source": "/Users/jari/DATA/Projects/3D_House_DSM/",
+        "dsm_path": "/Users/jari/DATA/Projects/DSM/",
+        "dtm_source": "/Users/jari/DATA/Projects/3D_House_DTM/",
+        "dtm_path": "/Users/jari/DATA/Projects/DTM/",
+    }
     json_string = json.dumps(directories)
-    with open('./data/dsm_and_dtm_directories', 'w') as outfile:
+    with open("./data/dsm_and_dtm_directories", "w") as outfile:
         outfile.write(json_string)
 
 
-
-def read_paths()-> Tuple[str,str,str,str]:
+def read_paths() -> Tuple[str, str, str, str]:
     """
     Reads correct paths from JSON file
     :returns : all paths (str) in the order: dsm_path, dtm_path, dsm_source, dtm_source
     """
-    with open('./data/dsm_and_dtm_directories') as json_file:
+    with open("./data/dsm_and_dtm_directories") as json_file:
         paths = dict(json.load(json_file))
-        dsm_source = paths.get('dsm_source')
-        dsm_path = paths.get('dsm_path')
-        dtm_source = paths.get('dtm_source')
-        dtm_path = paths.get('dtm_path')
+        dsm_source = paths.get("dsm_source")
+        dsm_path = paths.get("dsm_path")
+        dtm_source = paths.get("dtm_source")
+        dtm_path = paths.get("dtm_path")
         return dsm_path, dtm_path, dsm_source, dtm_source
 
-def copy_files(dsm:bool):
-    """ copies files to DSM or DTM folder. 
+
+def copy_files(dsm: bool):
+    """copies files to DSM or DTM folder.
     :dsm : a boolean value, if True DSM files are copied. Otherwise DTM files will be copied"""
 
     dsm_path, dtm_path, dsm_source, dtm_source = read_paths()
@@ -58,7 +59,7 @@ def copy_files(dsm:bool):
     else:
         source_path = dtm_source
         dest_path = dtm_path
-    
+
     counter = 0
 
     for path, dirs, files in os.walk(source_path):
@@ -80,6 +81,7 @@ def copy_files(dsm:bool):
                 counter += 1
     print("Total count of files:", counter)
 
+
 def create_list_of_shp_files() -> Tuple[list, list]:
     """
     Searches all the files ending with .shp and adds those filenames to a list. Creates a sexond list that has tif-names.
@@ -88,12 +90,12 @@ def create_list_of_shp_files() -> Tuple[list, list]:
     dsm_path, dtm_path, dsm_source, dtm_source = read_paths()
     # Creating a list of .shp files and sorting the list
     all_files = os.listdir(dsm_path)
-    shp_files=[]
+    shp_files = []
     for filename in all_files:
         if filename.endswith(".shp"):
             shp_files.append(filename)
     shp_files = natsorted(shp_files)
-    
+
     # Creating a list of .tif files in same order as .shp files
     dsm_tif_files, dtm_tif_files = [], []
 
@@ -101,7 +103,7 @@ def create_list_of_shp_files() -> Tuple[list, list]:
     regex_compiled = re.compile(pattern)
     for shp_file in shp_files:
 
-        result = regex_compiled.findall(shp_file)[0] 
+        result = regex_compiled.findall(shp_file)[0]
         dsm_tif_file = f"DHMVIIDSMRAS1m_{result}tif"
         dsm_tif_files.append(dsm_tif_file)
         dtm_tif_file = f"DHMVIIDTMRAS1m_{result}tif"
@@ -109,13 +111,13 @@ def create_list_of_shp_files() -> Tuple[list, list]:
 
     # Checking that generated .tif filename actually exists
     for dsm_tif_file in dsm_tif_files:
-        if not(dsm_tif_file in all_files):
+        if not (dsm_tif_file in all_files):
             print("FILE DOESN'T EXISTS", dsm_tif_file)
     all_dtm_files = os.listdir(dtm_path)
     for dtm_tif_file in all_dtm_files:
-        if not(dtm_tif_file in all_dtm_files):
+        if not (dtm_tif_file in all_dtm_files):
             print("FILE DOESN'T EXISTS", dtm_tif_file)
-            
+
     return shp_files, dsm_tif_files, dtm_tif_files
 
 
@@ -135,10 +137,21 @@ def create_lambert_coordinates():
         right_list.append(round(sh.bbox[2], -3))
         top_list.append(round(sh.bbox[3], -3))
 
-    # Create  a dataframe from the lists and save it to a CSV file  
-    my_dataframe = pd.DataFrame(list(zip(left_list, bottom_list, right_list, top_list, dsm_tif_files, dtm_tif_files)), 
-    columns = ['Left', 'Bottom', 'Right', 'Top', 'DSM_file', 'DTM_file'])
-    my_dataframe.to_csv('./data/lambert_coordinates.csv')
+    # Create  a dataframe from the lists and save it to a CSV file
+    my_dataframe = pd.DataFrame(
+        list(
+            zip(
+                left_list,
+                bottom_list,
+                right_list,
+                top_list,
+                dsm_tif_files,
+                dtm_tif_files,
+            )
+        ),
+        columns=["Left", "Bottom", "Right", "Top", "DSM_file", "DTM_file"],
+    )
+    my_dataframe.to_csv("./data/lambert_coordinates.csv")
+
 
 create_lambert_coordinates()
-

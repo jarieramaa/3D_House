@@ -31,7 +31,7 @@ def show_3d_house(title, raster_chm):
         yanchor='bottom',
         pad=dict(t=45, r=10),
         #Autorotate
-        buttons=[dict(label='Play',
+        buttons=[dict(label='Rotate',
                                  method='animate',
                                  args=[None, dict(frame=dict(duration=5, redraw=True), 
                                                              transition=dict(duration=0),
