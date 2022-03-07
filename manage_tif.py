@@ -75,6 +75,7 @@ def get_polygon(coordinates:list, draw_polygon:bool) -> Polygon:
    x, y = _convert_coordinates(coordinates)
    polygon = Polygon(zip(x, y))
    print(zip(x,y))
+
    polygon = gpd.GeoDataFrame(index=[0], crs='epsg:31370', geometry=[polygon])
    if draw_polygon:
       polygon.plot()

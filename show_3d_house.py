@@ -6,6 +6,24 @@ import plotly.graph_objects as go
 from plotly.offline import plot
 import numpy as np
 
+#def calculate_3d_house_volume(raster_chm):
+#    """This method calculates the volume of the 3D house.
+#    :raster_chm: CHM raster, type: rasterio.io.DatasetReader
+#    :return: volume of the 3D house
+#    """
+#    CHM_array = raster_chm[0]
+#    volume = np.sum(CHM_array)
+#    return volume
+
+#def calculate_3d_house_height(raster_chm):
+#    """This method calculates the height of the 3D house.
+#    :raster_chm: CHM raster, type: rasterio.io.DatasetReader
+#    :return: height of the 3D house
+#    """
+#    CHM_array = raster_chm[0]
+#    height = np.max(CHM_array)
+#    return height
+
 def show_3d_house(title, raster_chm):
     """This method shows the 3D house in the browser.
     :title: title of the plot, address is shown in the title
