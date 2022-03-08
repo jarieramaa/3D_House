@@ -22,27 +22,20 @@ def main():
     address_ui.close_window()
     time_0 = address_ui.get_start_time
     time_1 = time.time()
-
-    print("address.coordinates:", house_address.coordinates)
     dsm_tif, dtm_tif = manage_tif.get_tif(house_address.coordinates)
     polygon = manage_tif.get_polygon(house_address.coordinates, draw_polygon)
-
     raster_chm = manage_tif.mask_tif_files(dsm_tif, dtm_tif, polygon)
-
     whole_address_title = f"{house_address.street} \
         {house_address.street_nbr}, \
         {house_address.post_code} \
         {house_address.municipality}".upper()
 
     show_3d_house.show_3d_house(whole_address_title, raster_chm)
-    print("Polygon area: ", polygon.area)
     time_2 = time.time()
-    total_time = time_2 - time_0
-    print("total time: ", total_time)
-    api_time = time_1 - time_0
-    print("api_time: ", api_time)
-    other_time = time_2 - time_1
-    print("other_time: ", other_time)
+    print("Polygon area: ", polygon.area)
+    print("Time used for API call ", time_1 - time_0)
+    print("Time used (excluding API): ", time_2 - time_1)
+    print("total time: ", time_2 - time_0)
 
 if __name__ == "__main__":
     main()

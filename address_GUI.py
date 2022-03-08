@@ -64,17 +64,11 @@ class AddressGUI:
         is_successful = False
         while is_successful is False:
             event, values = self.window.read()
-            print("reading values")
             self.address_data.street = values[0]
             self.address_data.street_nbr = values[1]
             self.address_data.post_code = values[2]
             self.address_data.municipality = values[3]
             draw_polygon = values[4]
-            print("self.address_data.street: ", self.address_data.street)
-            print("self.address_data.street_nbr: ", self.address_data.street_nbr)
-            print("self.address_data.post_code: ", self.address_data.post_code)
-            print("self.address_data.municipality: ", self.address_data.municipality)
-            print("draw_polygon: ", draw_polygon)
 
             if event in (
                 sg.WIN_CLOSED,
@@ -83,30 +77,18 @@ class AddressGUI:
                 break
             if self.address_data.validated is False:
                 continue
-            print("######## api_q.get_address() ALKAA ######## ")
             self.time_0 = time.time()
-            print("time_0: ", self.time_0)
             is_successful = api_q.get_address(self.address_data, test)
-            print("######## api_q.get_address() PÄÄTTYY ######## ")
-            print("is_successful = ", is_successful)
-            print("EVENT:", event, " ---- is_successful", is_successful)
             if event == "Ok" and is_successful:
 
                 the_coordinates, is_successful = api_q.get_coordinates()
                 self.address_data.coordinates = the_coordinates
-                print(
-                    "GUI.get_address: address.coordinates: ",
-                    self.address_data.coordinates,
-                )
                 if is_successful is False or the_coordinates == (None, None):
                     sg.popup_ok(
                         "No address found! Please, make sure that the address is in Flanders.",
                         font=font,
                     )
                 else:
-                    print(
-                        "\n\n>>>>>>> self.address_data", self.address_data.coordinates
-                    )
                     return self.address_data, draw_polygon
             else:
                 sg.popup_ok(

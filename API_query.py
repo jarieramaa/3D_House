@@ -33,7 +33,6 @@ class ApiQuery:
 
         # adresMatches / warnings, let's continue with adresMatches
         addres_matches = self._address_dict.get("adresMatches")
-        print("addres_matches", addres_matches)
 
         # Take the first address from the list (there is only one)
         # and convert it to pandas DataFrame
@@ -48,9 +47,6 @@ class ApiQuery:
 
         # address_objects list, get the 'details' from the dictionary. There is an url.
         address_objects = row_1["adresseerbareObjecten"]
-        print(len(address_objects))
-        print("address_objects: ", address_objects)
-        print("==" * 20)
         if address_objects is None or len(address_objects) == 0:
             return None, False
         detail_url = address_objects[0].get("detail")
@@ -102,15 +98,6 @@ class ApiQuery:
             street = "Tildonksesteenweg"
             street_nbr = 71
             post_code = 3020
-            # uitbreidingstraat 3 2840 haren - original
-            # Tildonksesteenweg 71 3020 Herent - horisontal split - nice house!!
-            # Regentschapsstraat 44 , Brussel 1000 -- does not work
-            # Klipgaardestraat 9 3473 Kortenaken - 4 ways split
-
-        print("street: ", street)
-        print("street_nbr: ", street_nbr)
-        print("post_code: ", post_code)
-        print("municipality: ", municipality)
 
         self._address_reguest = requests.get(
             "https://api.basisregisters.vlaanderen.be/v1/adresmatch",
@@ -124,14 +111,7 @@ class ApiQuery:
 
         request = self._address_reguest.json()
         self._address_dict = dict(request)
-        print("_address_dict", self._address_dict)
         warnings = self._address_dict.get("warnings")
-        print("Warnings", warnings)
         if self._address_reguest.status_code != 200 or len(warnings) > 0:
-            print("status code", self._address_reguest.status_code)
-            print("warnings", warnings)
-            print("Error when reading the address. Pls try again")
-            print("API_query.get_address palauttaa False")
             return False
-        print("API_query.get_address palauttaa True")
         return True
