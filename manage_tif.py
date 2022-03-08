@@ -1,16 +1,16 @@
 """ This module contains the methods that are needed for modifying the tif files
 and their coordinates."""
 
+import os
 from typing import Tuple
 import pandas as pd
 from shapely.geometry import Polygon
 import geopandas as gpd
 import rasterio
-import os
 from rasterio.mask import mask
 import matplotlib.pyplot as plt
 
-import handle_files
+import setup
 
 
 def _convert_coordinates(coordinates: list) -> Tuple[list, list]:
@@ -33,25 +33,20 @@ def get_tif(coordinates) -> Tuple[str, str]:
     """
     x_coord, y_coord = _convert_coordinates(coordinates)
     my_df = pd.read_csv("./data/lambert_coordinates.csv")  # Load the csv file
-    x_min, x_max, y_min, y_max = min(x_coord), max(x_coord), min(y_coord), max(y_coord)
     my_df = my_df[
-        (my_df["Left"] < x_min)
-        & (my_df["Right"] > x_max)
-        & (my_df["Bottom"] < y_min)
-        & (my_df["Top"] > y_max)
+        (my_df["Left"] < min(x_coord))
+        & (my_df["Right"] > max(x_coord))
+        & (my_df["Bottom"] < min(y_coord))
+        & (my_df["Top"] > max(y_coord))
     ]
-
     dsm_file = my_df.iloc[0]["DSM_file"]
     dtm_file = my_df.iloc[0]["DTM_file"]
-
-    dsm_path, dtm_path, dsm_source, dtm_source = handle_files.read_paths()
+    dsm_path = setup.read_path("dsm_path")
+    dtm_path = setup.read_path("dtm_path")
     dsm_filename = os.path.join(dsm_path, dsm_file)
     dtm_filename = os.path.join(dtm_path, dtm_file)
     dsm_tif = rasterio.open(dsm_filename)
     dtm_tif = rasterio.open(dtm_filename)
-    print(type(dsm_file))
-    print(dsm_tif)
-
     return dsm_tif, dtm_tif
 
 
@@ -65,12 +60,8 @@ def mask_tif_files(
     :return: masked DSM and DTM tif files
     """
     # create a mask from the polygon
-    masked_dsm, masked_transform_dsm = mask(
-        dataset=dsm_tif, shapes=polygon.geometry, crop=True, pad=True
-    )
-    masked_dtm, masked_transform_dtm = mask(
-        dataset=dtm_tif, shapes=polygon.geometry, crop=True, pad=True
-    )
+    masked_dsm = mask(dataset=dsm_tif, shapes=polygon.geometry, crop=True, pad=True)[0]
+    masked_dtm = mask(dataset=dtm_tif, shapes=polygon.geometry, crop=True, pad=True)[0]
     raster_chm = masked_dsm - masked_dtm  # calculate the CHM
     return raster_chm
 

@@ -7,7 +7,8 @@ import time
 import manage_tif
 import show_3d_house
 import address_gui
-#import address
+
+# import address
 
 
 os.system("cls" if os.name == "nt" else "clear")
@@ -36,6 +37,7 @@ def main():
     print("Time used for API call ", time_1 - time_0)
     print("Time used (excluding API): ", time_2 - time_1)
     print("total time: ", time_2 - time_0)
+
 
 if __name__ == "__main__":
     main()

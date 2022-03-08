@@ -11,6 +11,7 @@ import address
 
 os.system("cls" if os.name == "nt" else "clear")
 
+
 class ApiQuery:
     """
     This class contains all methods that are needed for the API interaction.
