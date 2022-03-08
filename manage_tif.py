@@ -1,7 +1,6 @@
-""" This module contains the methods that are needed for modifying the tif files and their coordinates."""
+""" This module contains the methods that are needed for modifying the tif files
+and their coordinates."""
 
-
-from multiprocessing.connection import wait
 from typing import Tuple
 import pandas as pd
 from shapely.geometry import Polygon
@@ -10,24 +9,19 @@ import rasterio
 import os
 from rasterio.mask import mask
 import matplotlib.pyplot as plt
-from threading import Thread
 
 import handle_files
 
 
-#TODO these coordinates are for testing only
-#coordinates = [[[152063.6619006768, 196432.9290343821], [152064.33991667628, 196435.54989838228], [152058.34490867704, 196436.96609038487], [152055.61902067065, 196425.62989837676], [152061.46964468062, 196424.2372583747], [152061.4747646749, 196424.23623437434], [152063.6619006768, 196432.9290343821]]]
-
-
-def _convert_coordinates(coordinates:list) -> Tuple[list, list]:
-   """This method converts the coordinates to two separate lists of x and y coordinates.
-   :param: list of coordinates [[x1,y1], [x2,y2]...[xn, yn]]
-   :return: two lists of x and y coordinates"""
-   x, y = [], []
-   for xy_coord in coordinates[0]:
-      x.append(xy_coord[0])
-      y.append(xy_coord[1])
-   return x, y
+def _convert_coordinates(coordinates: list) -> Tuple[list, list]:
+    """This method converts the coordinates to two separate lists of x and y coordinates.
+    :param: list of coordinates [[x1,y1], [x2,y2]...[xn, yn]]
+    :return: two lists of x and y coordinates"""
+    x_coord, y_coord = [], []
+    for xy_coord in coordinates[0]:
+        x_coord.append(xy_coord[0])
+        y_coord.append(xy_coord[1])
+    return x_coord, y_coord
 
 
 def get_tif(coordinates) -> Tuple[str, str]:
@@ -37,14 +31,18 @@ def get_tif(coordinates) -> Tuple[str, str]:
     :coordinates : A list of coordinates that
     :return raster_files, two strings that contains the correct tif files (dsm and dtm).
     """
-    x, y = _convert_coordinates(coordinates)
-    my_df = pd.read_csv('./data/lambert_coordinates.csv') # Load the csv file
-    x_min, x_max, y_min, y_max  = min(x), max(x), min(y), max(y)
-    # TODO what happens if the coordinates are not in one tif file (the house is between files)? Will this return the two tif files or nothing?
-    my_df = my_df[(my_df['Left'] < x_min) & (my_df['Right'] > x_max) & (my_df['Bottom'] < y_min) & (my_df['Top'] > y_max)]
+    x_coord, y_coord = _convert_coordinates(coordinates)
+    my_df = pd.read_csv("./data/lambert_coordinates.csv")  # Load the csv file
+    x_min, x_max, y_min, y_max = min(x_coord), max(x_coord), min(y_coord), max(y_coord)
+    my_df = my_df[
+        (my_df["Left"] < x_min)
+        & (my_df["Right"] > x_max)
+        & (my_df["Bottom"] < y_min)
+        & (my_df["Top"] > y_max)
+    ]
 
-    dsm_file = my_df.iloc[0]['DSM_file']
-    dtm_file = my_df.iloc[0]['DTM_file']
+    dsm_file = my_df.iloc[0]["DSM_file"]
+    dtm_file = my_df.iloc[0]["DTM_file"]
 
     dsm_path, dtm_path, dsm_source, dtm_source = handle_files.read_paths()
     dsm_filename = os.path.join(dsm_path, dsm_file)
@@ -56,7 +54,10 @@ def get_tif(coordinates) -> Tuple[str, str]:
 
     return dsm_tif, dtm_tif
 
-def mask_tif_files(dsm_tif, dtm_tif , polygon: Polygon) -> Tuple[rasterio.io.DatasetReader, rasterio.io.DatasetReader]:
+
+def mask_tif_files(
+    dsm_tif, dtm_tif, polygon: Polygon
+) -> Tuple[rasterio.io.DatasetReader, rasterio.io.DatasetReader]:
     """This method masks the tif files with the polygon given as a parameter.
     :dsm_tif: DSM tif file
     :dtm_tif: DTM tif file
@@ -64,32 +65,23 @@ def mask_tif_files(dsm_tif, dtm_tif , polygon: Polygon) -> Tuple[rasterio.io.Dat
     :return: masked DSM and DTM tif files
     """
     # create a mask from the polygon
-    masked_DSM, masked_transform_DSM = mask(dataset=dsm_tif, shapes=polygon.geometry, crop=True, pad=True)
-    masked_DTM, masked_transform_DTM = mask(dataset=dtm_tif, shapes=polygon.geometry, crop=True, pad=True)  
-    raster_CHM = masked_DSM - masked_DTM # calculate the CHM
-    return raster_CHM
+    masked_dsm, masked_transform_dsm = mask(
+        dataset=dsm_tif, shapes=polygon.geometry, crop=True, pad=True
+    )
+    masked_dtm, masked_transform_dtm = mask(
+        dataset=dtm_tif, shapes=polygon.geometry, crop=True, pad=True
+    )
+    raster_chm = masked_dsm - masked_dtm  # calculate the CHM
+    return raster_chm
 
-def get_polygon(coordinates:list, draw_polygon:bool) -> Polygon:
-   """This polygon is needed for masking the .tif files
-   :param: list of coordinates [[x1,y1], [x2,y2]...[xn, yn]]"""
-   x, y = _convert_coordinates(coordinates)
-   polygon = Polygon(zip(x, y))
-   print(zip(x,y))
 
-   polygon = gpd.GeoDataFrame(index=[0], crs='epsg:31370', geometry=[polygon])
-   if draw_polygon:
-      polygon.plot()
-      plt.show()
-   return polygon
-
-"""class PolygonDraw(Thread):
-   def __init__(self, polygon):
-      Thread.__init__(self)
-      self.polygon = polygon
-      print("Thread initialized")
-      #self.draw_polygon(polygon)
-
-   def run(self):
-      print("Thread running")
-      self.polygon.plot()
-      plt.show()"""
+def get_polygon(coordinates: list, draw_polygon: bool) -> Polygon:
+    """This polygon is needed for masking the .tif files
+    :param: list of coordinates [[x1,y1], [x2,y2]...[xn, yn]]"""
+    x_coord, y_coord = _convert_coordinates(coordinates)
+    polygon = Polygon(zip(x_coord, y_coord))
+    polygon = gpd.GeoDataFrame(index=[0], crs="epsg:31370", geometry=[polygon])
+    if draw_polygon:
+        polygon.plot()
+        plt.show()
+    return polygon

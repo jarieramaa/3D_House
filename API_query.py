@@ -11,16 +11,7 @@ import address
 
 os.system("cls" if os.name == "nt" else "clear")
 
-# TODO The logic to ask the address from the user.
-# Also could check that the given address is valid.∏
-# There was a idea for autofill (the database should be
-# loaded first)
-# TODO the conversion to coordinates is quite long, maybe
-# it could be a separate module, especially if there is more
-# logic for address (see above)
-
-
-class API_query:
+class ApiQuery:
     """
     This class contains all methods that are needed for the API interaction.
     """
@@ -142,6 +133,5 @@ class API_query:
             print("Error when reading the address. Pls try again")
             print("API_query.get_address palauttaa False")
             return False
-        else:
-            print("API_query.get_address palauttaa True")
-            return True
+        print("API_query.get_address palauttaa True")
+        return True

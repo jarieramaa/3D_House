@@ -1,16 +1,16 @@
 """ This module reads the downloaded files from different folders starting
-from on location and it's subfolder (path_dsm) and copies all the necessary 
+from on location and it's subfolder (path_dsm) and copies all the necessary
 files to a one folder (destination_dsm)
 """
 
 import os
+import re
+from typing import Tuple
+import json
 import shutil
 from natsort import natsorted
 import shapefile
 import pandas as pd
-import re
-from typing import Tuple
-import json
 
 
 # clear the screen
@@ -29,7 +29,7 @@ def write_paths():
         "dtm_path": "/Users/jari/DATA/Projects/DTM/",
     }
     json_string = json.dumps(directories)
-    with open("./data/dsm_and_dtm_directories", "w") as outfile:
+    with open("./data/dsm_and_dtm_directories", "w", encoding='UTF-8') as outfile:
         outfile.write(json_string)
 
 
@@ -38,7 +38,7 @@ def read_paths() -> Tuple[str, str, str, str]:
     Reads correct paths from JSON file
     :returns : all paths (str) in the order: dsm_path, dtm_path, dsm_source, dtm_source
     """
-    with open("./data/dsm_and_dtm_directories") as json_file:
+    with open("./data/dsm_and_dtm_directories", encoding='UTF-8') as json_file:
         paths = dict(json.load(json_file))
         dsm_source = paths.get("dsm_source")
         dsm_path = paths.get("dsm_path")
@@ -65,13 +65,7 @@ def copy_files(dsm: bool):
     for path, dirs, files in os.walk(source_path):
         for filename in files:
             if (
-                filename.endswith(".dbf")
-                or filename.endswith(".prj")
-                or filename.endswith(".sbn")
-                or filename.endswith(".sbx")
-                or filename.endswith(".shp")
-                or filename.endswith(".shx")
-                or filename.endswith(".tif")
+                filename.endswith((".dbf", ".prj", ".sbn", ".sbx", ".shp", ".shx", ".tif"))
             ):
                 file_from = os.path.join(path, filename)
                 file_to = dest_path + filename
@@ -84,8 +78,10 @@ def copy_files(dsm: bool):
 
 def create_list_of_shp_files() -> Tuple[list, list]:
     """
-    Searches all the files ending with .shp and adds those filenames to a list. Creates a sexond list that has tif-names.
-    :return : two lists. First one is containing all the .shp filenames and second one generated .tif files.
+    Searches all the files ending with .shp and adds those filenames to a list.
+    Creates a sexond list that has tif-names.
+    :return : two lists. First one is containing all the .shp filenames and second
+    one generated .tif files.
     """
     dsm_path, dtm_path, dsm_source, dtm_source = read_paths()
     # Creating a list of .shp files and sorting the list
@@ -111,11 +107,11 @@ def create_list_of_shp_files() -> Tuple[list, list]:
 
     # Checking that generated .tif filename actually exists
     for dsm_tif_file in dsm_tif_files:
-        if not (dsm_tif_file in all_files):
+        if not dsm_tif_file in all_files:
             print("FILE DOESN'T EXISTS", dsm_tif_file)
     all_dtm_files = os.listdir(dtm_path)
     for dtm_tif_file in all_dtm_files:
-        if not (dtm_tif_file in all_dtm_files):
+        if not dtm_tif_file in all_dtm_files:
             print("FILE DOESN'T EXISTS", dtm_tif_file)
 
     return shp_files, dsm_tif_files, dtm_tif_files
@@ -131,11 +127,11 @@ def create_lambert_coordinates():
 
     # Read the boundaries and add them to lists
     for filename in shp_files:
-        sh = shapefile.Reader(os.path.join(dsm_path, filename))
-        left_list.append(round(sh.bbox[0], -3))
-        bottom_list.append(round(sh.bbox[1], -3))
-        right_list.append(round(sh.bbox[2], -3))
-        top_list.append(round(sh.bbox[3], -3))
+        shapef = shapefile.Reader(os.path.join(dsm_path, filename))
+        left_list.append(round(shapef.bbox[0], -3))
+        bottom_list.append(round(shapef.bbox[1], -3))
+        right_list.append(round(shapef.bbox[2], -3))
+        top_list.append(round(shapef.bbox[3], -3))
 
     # Create  a dataframe from the lists and save it to a CSV file
     my_dataframe = pd.DataFrame(

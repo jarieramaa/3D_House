@@ -23,6 +23,8 @@ Based to that address the solution selects correct lidar (light detection and ra
 
 # Usage
 
+FILE LOCATIONS!!
+
 Start program by command 'python main.py'. 
 
 A graphical user interface will open. Enter any address in Flanders and press 'Ok'-button. There is a check box 'Floor plan'. If selected the house floor plan will be presented. After closing floor plan, the 3D model will be presented.

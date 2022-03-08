@@ -1,15 +1,15 @@
 """ simple dialog with a text input fields for user to enter a city,
 postcode, street and street number and a button to submit the data.
 """
-
-import PySimpleGUI as sg
 import time
+import PySimpleGUI as sg
 
-import API_query
+
+import api_query
 import address
 
 
-class Address_GUI:
+class AddressGUI:
     """Graphical user interface for the address input"""
 
     def __init__(self) -> None:
@@ -25,7 +25,7 @@ class Address_GUI:
         Open a dialog window to get the user input
         """
         sg.theme("DarkAmber")  # Add a touch of color
-        api_query = API_query.API_query(test)
+        api_q = api_query.ApiQuery(test)
         font = ("Arial", 14)
         txt_size = (16, 1)
         # my_list =['first item', 'second item', 'third item']
@@ -52,9 +52,6 @@ class Address_GUI:
             [sg.Text("")],
             [sg.Checkbox("Show Floor Plan", default=True)],
             [sg.Text("")],
-            # TODO add a button to show all the possible addresses
-            #   [sg.Button('Show', font= font)],
-            # [sg.Listbox(my_list, size=(70, 20), font = font)],
             [sg.Button("Ok", font=font), sg.Button("Cancel", font=font)],
         ]
 
@@ -86,16 +83,16 @@ class Address_GUI:
                 break
             if self.address_data.validated is False:
                 continue
-            print("######## api_query.get_address() ALKAA ######## ")
+            print("######## api_q.get_address() ALKAA ######## ")
             self.time_0 = time.time()
             print("time_0: ", self.time_0)
-            is_successful = api_query.get_address(self.address_data, test)
-            print("######## api_query.get_address() PÄÄTTYY ######## ")
+            is_successful = api_q.get_address(self.address_data, test)
+            print("######## api_q.get_address() PÄÄTTYY ######## ")
             print("is_successful = ", is_successful)
             print("EVENT:", event, " ---- is_successful", is_successful)
             if event == "Ok" and is_successful:
 
-                the_coordinates, is_successful = api_query.get_coordinates()
+                the_coordinates, is_successful = api_q.get_coordinates()
                 self.address_data.coordinates = the_coordinates
                 print(
                     "GUI.get_address: address.coordinates: ",
@@ -106,7 +103,6 @@ class Address_GUI:
                         "No address found! Please, make sure that the address is in Flanders.",
                         font=font,
                     )
-                    continue
                 else:
                     print(
                         "\n\n>>>>>>> self.address_data", self.address_data.coordinates
@@ -117,7 +113,7 @@ class Address_GUI:
                     "No address found! \nPlease, make sure that the address is in Flanders.",
                     font=font,
                 )
-                continue
+
     @property
     def get_start_time(self):
         """

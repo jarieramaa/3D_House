@@ -6,7 +6,7 @@ import time
 
 import manage_tif
 import show_3d_house
-import address_GUI
+import address_gui
 #import address
 
 
@@ -16,11 +16,11 @@ os.system("cls" if os.name == "nt" else "clear")
 def main():
     """
     This function is called when the program is run."""
-    address_gui = address_GUI.Address_GUI()
+    address_ui = address_gui.AddressGUI()
 
-    house_address, draw_polygon = address_gui.get_address(False)
-    address_gui.close_window()
-    time_0 = address_gui.get_start_time
+    house_address, draw_polygon = address_ui.get_address(False)
+    address_ui.close_window()
+    time_0 = address_ui.get_start_time
     time_1 = time.time()
 
     print("address.coordinates:", house_address.coordinates)
