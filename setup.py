@@ -12,6 +12,7 @@ import shutil
 from natsort import natsorted
 import shapefile
 import pandas as pd
+import pickle
 
 
 # clear the screen
@@ -64,9 +65,9 @@ def copy_files(dsm: bool):
     counter = 0
     for path, dirs, files in os.walk(source_path):
         for filename in files:
-            #if filename.endswith(
+            # if filename.endswith(
             #    (".dbf", ".prj", ".sbn", ".sbx", ".shp", ".shx", ".tif")
-            #):
+            # ):
             if filename.endswith((".tif", ".shp")):
                 file_from = os.path.join(path, filename)
                 file_to = dest_path + filename
@@ -149,25 +150,25 @@ def create_lambert_coordinates():
     )
     my_dataframe.to_csv("./data/lambert_coordinates.csv")
 
+
 def main(args):
     """
     Main function
     """
     print(args)
-    if 'dsm' in args:
-        #copy_files(True)
+    if "dsm" in args:
+        # copy_files(True)
         print("Copying DSM files")
         copy_files(True)
 
-    if 'dtm' in args:
-        #copy_files(True)
+    if "dtm" in args:
+        # copy_files(True)
         print("Copying DTM files")
         copy_files(False)
-    
-    if 'lambert' in args:
+
+    if "lambert" in args:
         print("Creating lambert coordinates")
         create_lambert_coordinates()
-    
 
 
 if __name__ == "__main__":

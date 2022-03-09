@@ -37,21 +37,26 @@ There are modules that are needed to run this program. Here is a list of them an
 
 
 ## File handling
-File locations are defined in a JSON file: './data/dsm_and_dtm_directories'. 
+File locations are defined in a JSON file: './data/dsm\_and\_dtm\_directories'. 
 There are four file locations:
-- dsm_source, contains all the dsm files (original dsm files)
-- dsm_path, contains only the required dsm .tif and .shp files (copied with setup.py program)
-- dtm_source, contains all the dtm files (original dtm files)
-- dtm_path, contains only the required dtm .tif and .shp files (copied with setup.py program)
+
+| Operation                  | Command                                  |
+|----------------------------| -----------------------------------------|
+| dsm_source            | path for original dsm files                    |
+| dsm_path            | contains only the required dsm .tif and .shp files (copied with setup.py program)            |
+| dtm_source            | path for original dtm files                      |
+| dtm_path            | contains only the required dtm .tif and .shp files (copied with setup.py program)                    |
+
+Please, edit this JSON file before running setup.py.
 
 setup.py copies the files to correct location and creates lambert_coordinates.csv file. Lambert csv file is needed to optimize the code (only required .tif file is opened). Before using setup.py remember to edit the JSON file that contains the folder locations.
 
-| Operation                  | Command                                 |
-|----------------------------| ----------------------------------------|
-| Copy DSM files             | python setup dsm                        |
-| Copy DTM files             | python setup dtm                        |
-| Create lambert coordinates | python setup lambert                    |
-| all above at once*         | python setup dsm dtm lambert            |
+| Operation                  | Command                                  |
+|----------------------------| -----------------------------------------|
+| Copy DSM files             | python setup.py dsm                      |
+| Copy DTM files             | python setup.py dtm                      |
+| Create lambert coordinates | python setup.py lambert                  |
+| all above at once*         | python setup.py dsm dtm lambert          |
 
 *as shown above it's possible to combine commands. However, note that files needs to be copied before creating lambert csv-file!
 
@@ -60,18 +65,32 @@ setup.py copies the files to correct location and creates lambert_coordinates.cs
 
 # Usage
 
-Start program by command 'python main.py'. 
+The program can be started wit command: 'python main.py'. The following user interface will open:
 
-A graphical user interface will open. Enter any address in Flanders and press 'Ok'-button. There is a check box 'Floor plan'. If selected the house floor plan will be presented. After closing floor plan, the 3D model will be presented. Area of the floor plan will be shown in the terminal. As well as timing data (how long it took to gather data from terminal). Note that 3D picture is shown after the floor plan is closed. If measuring performance uncheck floor plan check box. 
+![Graphical user interface for address](./presentation_utils/address_ui.png)
+*User interface for addresss*
+
+You can enter any address in Flanders and it will be shown after pressing 'Ok'-button. It's not required to fill in both town name and post code, either of them is enough. If address is not found, a error message will open. Also if there is any errors in the address, for example the post code is not four digits. 
+
+If 'Show floor plan' is selected then the Floor plan will be shown before showing the actual 3D House model. In this case the 3D model will be shown as soon as the floor plan is closed.
+
+![Example picture of the Floor plan](./presentation_utils/Floor_plan.png)
+*Example picture of the Floor plan*
+
+The Floor plan contains all the coordinates and there is also calculated area in square meters.
+
+The actual 3D model will open to web browser as soon as Floor plan picture is closed or directly after pressing Ok-button, if 'Show floor plan' -check box is not selected.
+
+![Example picture of the 3D house](./presentation_utils/3d_house.png)
+*3D house model*
+
+The 3D model is standard plotply graph. It's easy to see all the measurements of the building. You are able to rotate the house with mouse, pan or zoom in/out. Furthermore, there is alsoa 'Rotate' button in the 3D model. By pressing this button the 3D model will rotate 360 degrees. 
 
 
 
-There is a 'Rotate' button in the 3D model. By pressing this button the 3D model will rotate 360 degrees. 
+#  Speed is everything
 
+During this project a lot of optimization and time measurement has been done in order to make the program efficient. Currently the weakest link is the API. It will take somewhere between one to five seconds collect the data via API interface. Other than that it takes less than second to do the rest of calculation. Time is calculated from pressing Address UI Ok-button until the 3D model has been fully opened. 
 
+There was a plan to create a cache to store the information from those houses that have already been searched. By that way it would be possible to avoid using API if the address has been opened earlier and the respons time for the progam would be less than second.
 
-# Visuals
-
-# Timeline
-
-# Personal situation

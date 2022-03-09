@@ -80,7 +80,6 @@ class AddressGUI:
             self.time_0 = time.time()
             is_successful = api_q.get_address(self.address_data, test)
             if event == "Ok" and is_successful:
-
                 the_coordinates, is_successful = api_q.get_coordinates()
                 self.address_data.coordinates = the_coordinates
                 if is_successful is False or the_coordinates == (None, None):

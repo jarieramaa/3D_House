@@ -74,5 +74,6 @@ def get_polygon(coordinates: list, draw_polygon: bool) -> Polygon:
     polygon = gpd.GeoDataFrame(index=[0], crs="epsg:31370", geometry=[polygon])
     if draw_polygon:
         polygon.plot()
+        plt.title("Floor plan area: " + str(int(polygon.area)) + " m2")
         plt.show()
     return polygon
