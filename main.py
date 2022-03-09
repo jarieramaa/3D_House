@@ -19,7 +19,7 @@ def main():
     address_ui = address_gui.AddressGUI()
 
     house_address, draw_polygon = address_ui.get_address(False)
-    address_ui.close_window()
+    #address_ui.close_window()
     time_0 = address_ui.get_start_time
     time_1 = time.time()
     dsm_tif, dtm_tif = manage_tif.get_tif(house_address.coordinates)

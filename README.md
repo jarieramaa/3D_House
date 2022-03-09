@@ -65,7 +65,7 @@ setup.py copies the files to correct location and creates lambert_coordinates.cs
 
 # Usage
 
-The program can be started wit command: 'python main.py'. The following user interface will open:
+The program can be started wit command: 'python main.py'. The following user interface will be opened:
 
 ![Graphical user interface for address](./presentation_utils/address_ui.png)
 *User interface for addresss*
